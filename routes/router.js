@@ -11,7 +11,7 @@ const userMiddleware = require('../middleware/users.js');
 router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
   db.query(
     `SELECT * FROM Usuario WHERE LOWER(Correo) = LOWER(${db.escape(
-      req.body.Correo
+      req.body.correo
     )});`,
     (err, result) => {
 
@@ -23,7 +23,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
       } 
       //El correo se puede registrar
       else {
-        bcrypt.hash(req.body.Password, 10, (err, hash) => {
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
             return res.status(500).send({
               msg: err
@@ -33,9 +33,9 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
             db.query(
               `INSERT INTO Usuario (Correo, Nombre, Apellido, Password, IdRol, FechaCreacion) 
               VALUES (
-                ${db.escape(req.body.Correo)},
-                ${db.escape(req.body.Nombre)},
-                ${db.escape(req.body.Apellido)},
+                ${db.escape(req.body.correo)},
+                ${db.escape(req.body.nombre)},
+                ${db.escape(req.body.apellido)},
                 ${db.escape(hash)},
                 ${db.escape(1)},
                 now())`,
@@ -60,7 +60,7 @@ router.post('/sign-up', userMiddleware.validateRegister, (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   db.query(
-    `SELECT * FROM Usuario WHERE Correo = ${db.escape(req.body.Correo)};`,
+    `SELECT * FROM Usuario WHERE Correo = ${db.escape(req.body.correo)};`,
     (err, result) => {
       //El usuario no existe
       if (err) {
@@ -78,7 +78,7 @@ router.post('/login', (req, res, next) => {
 
       // check password
       bcrypt.compare(
-        req.body.Password,
+        req.body.password,
         result[0]['Password'],
         (bErr, bResult) => {
           // wrong password
@@ -148,6 +148,59 @@ router.get('/getCursos', (req, res, next) => {
 
 router.get('/secret-route', (req, res, next) => {
   res.send('This is the secret content. Only logged in users can see that!');
+});
+
+
+//Métodos para las funciones de ADMIN
+
+router.post('/admin/sign-up', userMiddleware.validateRegister, (req, res, next) => {
+  db.query(
+    `SELECT * FROM Usuario WHERE LOWER(Correo) = LOWER(${db.escape(
+      req.body.Correo
+    )});`,
+    (err, result) => {
+
+      //El correo ya está registrado
+      if (result.length) {
+        return res.status(409).send({
+          msg: 'El correo ya está registrado'
+        });
+      } 
+      //El correo se puede registrar
+      else {
+        bcrypt.hash(req.body.Password, 10, (err, hash) => {
+          if (err) {
+            return res.status(500).send({
+              msg: err
+            });
+          } else {
+            // has hashed pw => add to database
+            db.query(
+              `INSERT INTO Usuario (Correo, Nombre, Apellido, Password, IdRol, FechaCreacion) 
+              VALUES (
+                ${db.escape(req.body.Correo)},
+                ${db.escape(req.body.Nombre)},
+                ${db.escape(req.body.Apellido)},
+                ${db.escape(hash)},
+                ${db.escape(1)},
+                now())`,
+              (err, result) => {
+                if (err) {
+                  throw err;
+                  return res.status(400).send({
+                    msg: err
+                  });
+                }
+                return res.status(201).send({
+                  msg: 'Registro exitoso'
+                });
+              }
+            );
+          }
+        });
+      }
+    }
+  );
 });
 
 module.exports = router;

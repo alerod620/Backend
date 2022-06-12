@@ -4,13 +4,13 @@ module.exports= {
     validateRegister: (req, res, next) => {
         
         // username min length 3
-        if (!req.body.Correo || req.body.Correo.length < 13) {
+        if (!req.body.correo || req.body.correo.length < 13) {
             return res.status(400).send({
             msg: 'El correo debe tener una longitud mínima de 3 caracteres'
         });
       }
         // password min 6 chars
-        if (!req.body.Password || req.body.Password.length < 6) {
+        if (!req.body.password || req.body.password.length < 6) {
             return res.status(400).send({
             msg: 'La contraseña debe tener una longitud mínima de 6 caracteres'
             });
