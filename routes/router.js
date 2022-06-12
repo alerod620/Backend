@@ -156,7 +156,7 @@ router.get('/secret-route', (req, res, next) => {
 router.post('/admin/sign-up', userMiddleware.validateRegister, (req, res, next) => {
   db.query(
     `SELECT * FROM Usuario WHERE LOWER(Correo) = LOWER(${db.escape(
-      req.body.Correo
+      req.body.correo
     )});`,
     (err, result) => {
 
@@ -168,7 +168,7 @@ router.post('/admin/sign-up', userMiddleware.validateRegister, (req, res, next) 
       } 
       //El correo se puede registrar
       else {
-        bcrypt.hash(req.body.Password, 10, (err, hash) => {
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
             return res.status(500).send({
               msg: err
@@ -178,9 +178,9 @@ router.post('/admin/sign-up', userMiddleware.validateRegister, (req, res, next) 
             db.query(
               `INSERT INTO Usuario (Correo, Nombre, Apellido, Password, IdRol, FechaCreacion) 
               VALUES (
-                ${db.escape(req.body.Correo)},
-                ${db.escape(req.body.Nombre)},
-                ${db.escape(req.body.Apellido)},
+                ${db.escape(req.body.correo)},
+                ${db.escape(req.body.nombre)},
+                ${db.escape(req.body.apellido)},
                 ${db.escape(hash)},
                 ${db.escape(1)},
                 now())`,
