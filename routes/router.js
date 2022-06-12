@@ -115,6 +115,37 @@ router.post('/login', (req, res, next) => {
   );
 });
 
+router.get('/getCursos', (req, res, next) => {
+  db.query(
+    `SELECT * FROM Curso;`,
+    (err, result) => {
+      //No encuentra nada en la base de datos
+      if (err) 
+      {
+        throw err;
+        return res.status(400).send({
+          msg: err
+        });
+      }
+      //Obtiene todos los cursos en que se encuentran en la base de datos
+      if (!result.length) 
+      {
+        return res.status(401).send({
+          msg: 'Usuario o contraseña incorrecta'
+        });
+      }
+      else
+      {
+        return res.status(200).send({
+          msg: 'Consulta existosa',
+          value: result
+        })
+      }
+
+    }
+  );
+});
+
 router.get('/secret-route', (req, res, next) => {
   res.send('This is the secret content. Only logged in users can see that!');
 });
