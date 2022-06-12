@@ -6,11 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use(function (req, res, next){
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Contorl-Allow-Headers", "Origin, X-Requested-With, Content-Type  , Accept");
-    next();
-})
+app.use(cors());
 
 const router = require('./routes/router.js');
 app.use('/api', router);
